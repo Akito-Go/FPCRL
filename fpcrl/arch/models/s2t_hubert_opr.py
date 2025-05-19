@@ -385,24 +385,24 @@ class S2TTransformerEncoder(FairseqEncoder):
 
     @staticmethod
     def mask_src(s, p=0.75, n=2, m=3600):
-        B, S = s.shape  # B 是批量大小，S 是帧数
+        B, S = s.shape  # B is the batch size, S is the number of frames
 
-        # 创建一个与输入相同形状的张量，用于掩码
+        # Create a tensor of the same shape as the input for the mask
         s_masked = s.clone()
 
         if S >= m:
-            # 预先生成一个概率值，减少每次循环中调用 random.random()
+            # Generate a probability value in advance to reduce the number of calls to random.random() in each loop
             mask_probabilities = torch.rand(B) < p
 
-            # 对于每个样本，检查是否需要进行掩码
+            # For each sample, check if masking is needed
             for b in range(B):
-                if mask_probabilities[b]:  # 如果需要掩码
-                    # 随机选择掩码的起始点
+                if mask_probabilities[b]:  # If a mask is required
+                    # Randomly select the starting point of the mask
                     for _ in range(n):
-                        # 随机选择一个掩码的起始帧
-                        start_frame = random.randint(0, S - m)  # 保证至少有 m 帧被掩码
+                        # Randomly select a starting frame for a mask
+                        start_frame = random.randint(0, S - m)  # Ensure that at least m frames are masked
                         end_frame = start_frame + m
-                        s_masked[b, start_frame:end_frame] = 0  # 将该段掩码为 0（或其他指定值）
+                        s_masked[b, start_frame:end_frame] = 0  # Mask the segment to 0 (or other specified value)
 
         return s_masked
 
